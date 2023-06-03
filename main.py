@@ -70,9 +70,10 @@ def get_updates(access_token, refresh_token, user_id, cookie):
             cache[user_id] = favs
             if fav['item_amount'] >= 1:
                 tgtg_updates.append(fav)
-        if not fav in cache[user_id]:
-            if fav['item_amount'] >= 1:
-                tgtg_updates.append(fav)
+        for cfav in cache[user_id]:
+            if fav['item_id'] == cfav['item_id']:
+                if fav['item_amount'] >= 1 and cfav['item_amount'] == 0:
+                    tgtg_updates.append(fav)
     cache[user_id] = favs
     return tgtg_updates
 
@@ -137,10 +138,8 @@ async def check_for_user(tg_bot, userid):
 async def main(tg_bot):
     while True:
         for userid in active_users:
-            print("start check")
             await check_for_user(tg_bot, userid)
-            print("end check")
-        print(active_users)
+        print(f"Active users: {active_users}")
         time.sleep(30)
 
 def bot_loop(loop):
