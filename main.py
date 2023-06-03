@@ -123,6 +123,12 @@ async def init(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         print(f"Added: {user_data}")
         save_tgtg_users()
 
+async def info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user_id = update.message.from_user['id']
+    user_name = update.message.from_user['first_name']
+    await update.message.reply_html(
+        f"Hi {user_name}!\nYour user credentials are:\nfirst_name: {user_name}\nid: {user_id}")
+
 
 async def check_for_user(tg_bot, userid):
     access_token = tgtg_users[userid]['access_token']
@@ -184,6 +190,7 @@ if __name__ == '__main__':
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("stop", stop))
     application.add_handler(CommandHandler("init", init))
+    application.add_handler(CommandHandler("info", info))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling()
