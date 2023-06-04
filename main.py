@@ -125,6 +125,9 @@ async def init(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         tgtg_users[int(user_id)] = user_data
         print(f"Added: {user_data}")
         save_tgtg_users()
+        await update.message.reply_html(
+            f"You successfully initialised the bot!\nYou can now start the bot with /start")
+
 
 async def info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.message.from_user['id']
