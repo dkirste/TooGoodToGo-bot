@@ -84,11 +84,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.message.from_user['id']
 
     if check_auth(update.message.from_user):
-        active_users.append(user_id)
-        save_config()
-        print(f"Active Users: {active_users}")
-        await update.message.reply_html(
-            f"Hi {user.mention_html()}!\nYou successfully started the bot.")
+        if not user_id in active_users:
+            active_users.append(user_id)
+            save_config()
+            await update.message.reply_html(
+                f"Hi {user.mention_html()}!\nYou successfully started the bot.")
+            print(f"Active Users: {active_users}")
+        else:
+            await update.message.reply_html(
+                f"Hi {user.mention_html()}!\nYou already started the bot.")
     else:
         await update.message.reply_html(
             f"You are not authorized!.")
