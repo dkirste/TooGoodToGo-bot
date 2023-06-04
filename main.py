@@ -150,6 +150,7 @@ def check_updates_per_user(userid):
     while tries < 5:
         try:
             tgtg_updates = get_updates(access_token, refresh_token, user_id, cookie)
+            return tgtg_updates
         except:
             tries += 1
             time.sleep(0.5)
