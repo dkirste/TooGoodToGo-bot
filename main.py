@@ -136,21 +136,31 @@ async def info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         f"Hi {user_name}!\nYour user credentials are:\nfirst_name: {user_name}\nid: {user_id}")
 
 
-async def check_for_user(tg_bot, userid):
+def check_updates_per_user(userid):
     access_token = tgtg_users[userid]['access_token']
     refresh_token = tgtg_users[userid]['refresh_token']
     user_id = tgtg_users[userid]['user_id']
     cookie = tgtg_users[userid]['cookie']
-    tgtg_updates = get_updates(access_token, refresh_token, user_id, cookie)
-    for update in tgtg_updates:
-        update_text=f"{update['store_name']}\n<a href='{update['store_logo']}'>&#8205;</a>{update['item_amount']}x {update['item_name']} for {update['item_price']} EUR\n{update['store_address']}\nhttps://share.toogoodtogo.com/item/{update['item_id']}/"+str(time.time())
-        await tg_bot.send_message(chat_id=userid, text=update_text, parse_mode='HTML')
+    tries = 0
+    tgtg_updates = []
+    while tries < 5:
+        try:
+            tgtg_updates = get_updates(access_token, refresh_token, user_id, cookie)
+        except:
+            tries += 1
+            time.sleep(0.5)
+    return tgtg_updates
+
 
 
 async def main(tg_bot):
     while True:
         for userid in active_users:
-            await check_for_user(tg_bot, userid)
+            tgtg_updates = check_updates_per_user(userid)
+            for update in tgtg_updates:
+                update_text = f"{update['store_name']}\n<a href='{update['store_logo']}'>&#8205;</a>{update['item_amount']}x {update['item_name']} for {update['item_price']} EUR\n{update['store_address']}\nhttps://share.toogoodtogo.com/item/{update['item_id']}/" + str(
+                    time.time())
+                await tg_bot.send_message(chat_id=userid, text=update_text, parse_mode='HTML')
         print(f"Active users: {active_users}")
         time.sleep(30)
 
