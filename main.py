@@ -85,6 +85,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if check_auth(update.message.from_user):
         active_users.append(user_id)
+        save_config()
         print(f"Active Users: {active_users}")
         await update.message.reply_html(
             f"Hi {user.mention_html()}!\nYou successfully started the bot.")
@@ -99,8 +100,10 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         for i in range(len(active_users)):
             if active_users[i] == user_id:
                 active_users.pop(i)
+        save_config()
         await update.message.reply_html(
             f"You successfully stopped the bot.")
+
 
 async def init(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
@@ -111,7 +114,7 @@ async def init(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.message.from_user['id']
     if check_auth(update.message.from_user):
         await update.message.reply_html(
-            f"You will get an email from TooGoodToGo! Please check you mail and open the link on your desktop computer!\nMOBILE PHONES ARE NOT WORKING, SINCE THE APP IS OPENED.")
+            f"You will get an email from TooGoodToGo!\nPlease check you mailbox and open the link on your desktop computer!\n\nImportant: Mobile phones are not working, since they automatically open the app!")
         client = TgtgClient(email=email, timeout=1)
         credentials = client.get_credentials()
         user_data = {
