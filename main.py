@@ -67,13 +67,20 @@ def get_updates(access_token, refresh_token, user_id, cookie):
     favs = get_favs(access_token, refresh_token, user_id, cookie)
     for fav in favs:
         if not user_id in cache:
-            cache[user_id] = favs
             if fav['item_amount'] >= 1:
                 tgtg_updates.append(fav)
-        for cfav in cache[user_id]:
-            if fav['item_id'] == cfav['item_id']:
-                if fav['item_amount'] >= 1 and cfav['item_amount'] == 0:
-                    tgtg_updates.append(fav)
+                continue
+        elif not fav in cache[user_id]:
+            if fav['item_amount'] >= 1:
+                tgtg_updates.append(fav)
+        else:
+            for cfav in cache[user_id]:
+                if fav['item_id'] == cfav['item_id']:
+                    if fav['item_amount'] >= 1 and cfav['item_amount'] == 0:
+                        tgtg_updates.append(fav)
+
+
+
     cache[user_id] = favs
     return tgtg_updates
 
@@ -153,7 +160,7 @@ def check_updates_per_user(userid):
             return tgtg_updates
         except:
             tries += 1
-            time.sleep(0.5)
+            time.sleep(1)
     return tgtg_updates
 
 
@@ -165,7 +172,8 @@ async def main(tg_bot):
             for update in tgtg_updates:
                 update_text = f"{update['store_name']}\n<a href='{update['store_logo']}'>&#8205;</a>{update['item_amount']}x {update['item_name']} for {update['item_price']} EUR\n{update['store_address']}\nhttps://share.toogoodtogo.com/item/{update['item_id']}/" + str(
                     time.time())
-                await tg_bot.send_message(chat_id=userid, text=update_text, parse_mode='HTML')
+                msg_task = asyncio.create_task(tg_bot.send_message(chat_id=userid, text=update_text, parse_mode='HTML'))
+                await msg_task
         print(f"Active users: {active_users}")
         time.sleep(30)
 
