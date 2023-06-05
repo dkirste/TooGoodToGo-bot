@@ -70,16 +70,15 @@ def get_updates(access_token, refresh_token, user_id, cookie):
             if fav['item_amount'] >= 1:
                 tgtg_updates.append(fav)
                 continue
-        elif not fav in cache[user_id]:
-            if fav['item_amount'] >= 1:
-                tgtg_updates.append(fav)
         else:
+            id_list = []
             for cfav in cache[user_id]:
+                id_list.append(cfav['item_id'])
                 if fav['item_id'] == cfav['item_id']:
                     if fav['item_amount'] >= 1 and cfav['item_amount'] == 0:
                         tgtg_updates.append(fav)
-
-
+            if not fav['item_id'] in id_list and fav['item_amount'] >= 1:
+                tgtg_updates.append(fav)
 
     cache[user_id] = favs
     return tgtg_updates
